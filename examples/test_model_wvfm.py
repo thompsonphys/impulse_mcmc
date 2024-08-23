@@ -25,6 +25,9 @@ class LnLikelihoodWvfm():
 
         self.delta_f = self.ifo.frequency_array[1] - self.ifo.frequency_array[0]
 
+        self.ntemps = self.injection.recovery_options['ntemps']
+        self.nsamples = self.injection.recovery_options['nsamples']
+
     def __call__(self, params):
         """Generate likelihood evaluation
 

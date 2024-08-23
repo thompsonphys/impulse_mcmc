@@ -107,7 +107,7 @@ class CBCInjectionGenerator:
         
     def initialize_waveform_generator(self):
         """Generate recovery waveform generator
-        
+
         """
         self.waveform_generator = get_waveform_generator(
             self.recovery_options['approximant'], 
@@ -155,7 +155,8 @@ def _get_parameters_from_config_file(config_file):
     # convert floats appropriately
     injection_parameters.update({k:float(injection_parameters[k]) for k in ['f_low', 'f_ref', 'snr']})
     cbc_parameters = {a:float(b) for a,b in cbc_parameters.items()}
-    recovery_parameters.update({k:float(injection_parameters[k]) for k in ['f_low', 'f_ref']})
+    recovery_parameters.update({k:float(recovery_parameters[k]) for k in ['f_low', 'f_ref']})
+    recovery_parameters.update({k:int(recovery_parameters[k]) for k in ['ntemps', 'nsamples']})
 
     return {
         'injection':injection_parameters,
