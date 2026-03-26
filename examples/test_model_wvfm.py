@@ -35,6 +35,10 @@ class LnLikelihoodWvfm:
 
         self.f = self.ifo.frequency_array[self.frequency_mask]
 
+        self.signal_ovlp = overlap(
+            self.signal_response, self.signal_response, self.f, self.psd
+        )
+
         self.ntemps = self.injection.recovery_options["ntemps"]
         self.nsamples = self.injection.recovery_options["nsamples"]
 
@@ -76,7 +80,11 @@ class LnLikelihoodWvfm:
         rotation = np.exp(-1j * (2.0 * np.pi * self.f * dt + phase))
 
         result = get_overlap(
-            template_response * rotation, self.signal_response, self.f, self.psd
+            template_response * rotation,
+            self.signal_response,
+            self.signal_ovlp,
+            self.f,
+            self.psd,
         )
 
         # result = match(template_response, self.signal_response, self.psd, 2**18, True)
@@ -123,7 +131,7 @@ def overlap(h1_in, h2_in, f, psd):
     return np.real(simpson(integrand, x=f))
 
 
-def get_overlap(template, signal, f, psd):
+def get_overlap(template, signal, signal_ovlp, f, psd):
     """
     Wrapper to get the loglikelihood from the noise-weighted inner product between
     signal and model.
@@ -141,10 +149,9 @@ def get_overlap(template, signal, f, psd):
     """
 
     overlap_sig_temp = overlap(template, signal, f, psd)
-    overlap_sig_sig = overlap(signal, signal, f, psd)
     overlap_temp_temp = overlap(template, template, f, psd)
 
-    return overlap_sig_temp - 0.5 * (overlap_sig_sig + overlap_temp_temp)
+    return overlap_sig_temp - 0.5 * (signal_ovlp + overlap_temp_temp)
 
 
 def mass1_mass2_from_chirpmass_eta(chirp_mass, eta):
