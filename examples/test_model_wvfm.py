@@ -109,6 +109,9 @@ class LnPriorUniformWvfm:
         self.maxes = maxes
 
     def __call__(self, params):
+        if params[-1] < self.mins[-1] or params[-1] > self.maxes[-1]:
+            params[-1] = np.mod(params[-1], np.pi)
+
         if np.any(params < self.mins) or np.any(params > self.maxes):
             return -np.inf
         else:
